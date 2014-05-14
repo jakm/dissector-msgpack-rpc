@@ -17,9 +17,12 @@ clean:
 	rm -f $(OBJ) $(OUT)
 
 install: $(OUT)
-	if [ x"`uname`" = x"Darwin" ]; then \
-		install -m 0755 $(OUT) /Applications/Wireshark.app/Contents/Resources/lib/wireshark/plugins/; \
-	else \
-		install -t /usr/local/lib/wireshark/plugins/1.8.7/ -m 0755 $(OUT) ;\
-	fi
+#	if [ x"`uname`" = x"Darwin" ]; then \
+#		install -m 0755 $(OUT) /Applications/Wireshark.app/Contents/Resources/lib/wireshark/plugins/; \
+#	else \
+#		install -t /usr/local/lib/wireshark/plugins/1.8.7/ -m 0755 $(OUT) ;\
+#	fi
+
+	mkdir -p ${HOME}/.wireshark/plugins
+	install -m 0755 $(OUT) ${HOME}/.wireshark/plugins
 

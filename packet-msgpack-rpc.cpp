@@ -31,29 +31,30 @@ extern "C" {
 
 /* Initialize the protocol and registered fields */
 static int proto_msgpack = -1;
-  
+
 //static dissector_handle_t data_handle=NULL;
 static dissector_handle_t msgpack_rpc_handle=NULL;
 
 extern "C"
-gboolean heur_dissect_msgpack(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree);
+gboolean heur_dissect_msgpack(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data);
 
 extern "C"
 void dissect_msgpack(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree) {
-  (void)heur_dissect_msgpack(tvb, pinfo, tree);
+  (void)heur_dissect_msgpack(tvb, pinfo, tree, NULL);
 }
 
 extern "C"
 void proto_reg_handoff_msgpack(void)
 {
   static gboolean initialized=FALSE;
-  
+
   if (!initialized) {
     msgpack_rpc_handle = find_dissector(MSGPACK_ABBREV);
     if (msgpack_rpc_handle == NULL) {
       msgpack_rpc_handle = create_dissector_handle(dissect_msgpack, proto_msgpack);
     }
-    dissector_add("tcp.port", MSPPACK_RPC_PORT , msgpack_rpc_handle);
+    //dissector_add("tcp.port", MSPPACK_RPC_PORT , msgpack_rpc_handle);
+    dissector_add_uint("tcp.port", MSPPACK_RPC_PORT, msgpack_rpc_handle);
     initialized = TRUE;
   }
 }
@@ -118,7 +119,7 @@ void proto_register_msgpack(void)
       {"RPC Result", "msgpack.result", FT_STRING, BASE_NONE, NULL, 0x0,
        "result", HFILL}}
   };
-  
+
 
   static gint *ett[] = {
     &ett_msgpack_rpc,
@@ -217,7 +218,7 @@ int get_type(const guint8* const buff) {
 
 extern "C"
 
-gboolean heur_dissect_msgpack(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree)
+gboolean heur_dissect_msgpack(tvbuff_t *tvb, packet_info *pinfo, proto_tree *tree, void *data)
 {
   if (tvb_length(tvb) < 4) {return 0;}
   int offset = 0;
